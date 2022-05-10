@@ -1,20 +1,9 @@
-/**
- [Class Purpose]
- Author: Amy M.
- Version: 2022.XX.XX
- **/
+//This is the module where the Spooks class lives
 
 module.exports = class Spook {
-    constructor(title, year) {
-        this._year = year;
-        this._title = title;
-    }
+    constructor(spookTitle, spookYear) {
+        this.spookTitle = spookTitle;
+        this.spookYear = spookYear;
+    };
 
-    get title() {
-        return this._title;
-    }
-
-    get year() {
-        return this._year;
-    }
 }

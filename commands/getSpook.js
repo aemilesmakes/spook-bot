@@ -1,10 +1,18 @@
+//This is the command for getting a random spook.
+
 const { SlashCommandBuilder } = require('@discordjs/builders');
+const {initSyllabus} = require("../methods/syllabus");
+const {random} = require("underscore");
+
+let syllabus = initSyllabus();
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('spook')
         .setDescription('Suggests a random spook from the syllabus!'),
     async execute(interaction) {
-        await interaction.reply(`How about...`);
+        const randomSpook = syllabus[Math.floor(Math.random() * syllabus.length)];
+        let msg = `${randomSpook.spookTitle} (${randomSpook.spookYear})`;
+        await interaction.reply(`How about... ${msg}`);
     },
 };
