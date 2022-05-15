@@ -9,9 +9,7 @@ module.exports = async function connectDB() {
         console.log("Connected to DB!");
 
         // Make the appropriate DB calls
-        await  getSingleSpook(client, {
-            maximumNumberOfResults: 1
-        });
+        await  getSingleSpook(client);
 
     } catch (e) {
         console.error(e);
@@ -23,8 +21,7 @@ module.exports = async function connectDB() {
 
 //main().catch(console.error);
 
-async function getSingleSpook(client, {
-    maximumNumberOfResults = Number.MAX_SAFE_INTEGER} = {}) {
+async function getSingleSpook(client) {
     const cursor = client.db("spooky_film_club").collection("syllabus").find(
         {
             seen: { $eq: false },

@@ -26,7 +26,6 @@ for (const file of commandFiles) {
 client.once('ready', () => {
     mongoDB().catch(console.error);
     console.log('SpookBot is ready for class!');
-
 });
 
 //Handle interactions
