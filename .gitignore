@@ -4,6 +4,7 @@ out
 gen
 .idea
 config.json
+syllabus.json
 
 ### Node template
 # Logs
