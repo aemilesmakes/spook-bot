@@ -8,10 +8,10 @@ Version: 1.0.0
 const fs = require('node:fs');
 const { Client, Collection, Intents } = require('discord.js');
 const { token } = require('./config.json');
-const {initSyllabus} = require("./methods/syllabus");
-const {random, sample} = require("underscore");
-
+const mongoDB = require('./db_connect');
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
+
+//await db_client.connect();
 
 // Retrieve slash commands
 client.commands = new Collection();
@@ -24,7 +24,9 @@ for (const file of commandFiles) {
 
 //Actions to take when bot is ready
 client.once('ready', () => {
+    mongoDB().catch(console.error);
     console.log('SpookBot is ready for class!');
+
 });
 
 //Handle interactions

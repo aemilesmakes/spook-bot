@@ -2,7 +2,6 @@
 
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const {initSyllabus} = require("../methods/syllabus");
-const {random} = require("underscore");
 
 let syllabus = initSyllabus();
 

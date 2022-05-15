@@ -1,5 +1,4 @@
 //This is the module that initializes and populates the Syllabus array.
-
 const Spook = require("../classes/spooks");
 
 exports.initSyllabus = () => {
