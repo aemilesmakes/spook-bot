@@ -4,6 +4,7 @@ out
 gen
 .idea
 config.json
+syllabus.json
 
 ### Node template
 # Logs
@@ -48,6 +49,7 @@ build/Release
 # Dependency directories
 node_modules/
 jspm_packages/
+misc
 
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/
