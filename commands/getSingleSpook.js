@@ -10,7 +10,6 @@ let suggestArray = [
     "What about",
     "Have you considered"
 ]
-let suggest = suggestArray[Math.floor(Math.random() * suggestArray.length)];
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -20,7 +19,7 @@ module.exports = {
         const client = new MongoClient(MONGO_URI);
         await client.connect();
         let spook = await getSingleSpook(client);
-        //console.log(spook.title);
+        let suggest = suggestArray[Math.floor(Math.random() * suggestArray.length)];
         await interaction.reply(`${suggest} ${spook.title} (${spook.year})?`);
     }
 };
