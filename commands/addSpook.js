@@ -1,8 +1,7 @@
 // Add a spook to the database
-
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MongoClient } = require('mongodb');
-const { MONGO_URI } = require('../config.json');
+const { client } = require('../connect.js');
+const { printSyllabus } = require('../syllabus.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -24,21 +23,23 @@ module.exports = {
     async execute(interaction) {
         //get inputs from command in discord
         const movieTitle = interaction.options.getString('title');
-        const movieYear = parseInt(interaction.options.getString('year'));
+        const movieYear = interaction.options.getString('year');
         const movieDir = interaction.options.getString('director');
 
-        // IMPLEMENT SOME CHECKS FTLOG
-
-        //pass inputs to db
-        const client = new MongoClient(MONGO_URI);
-        await client.connect();
-        await addSpook(client, {
-            title: `${movieTitle}`,
-            year: `${movieYear}`,
-            director: `${movieDir}`,
-            seen: 'false'
-        });
-        await interaction.reply(`New spook added: ${movieTitle} (${movieYear})!`);
+        if (movieYear.length !== 4) { // YEAR CAN ONLY BE 4 CHARACTERS
+            await interaction.reply(`That's not a real year......... I'm not adding that :(`);
+        } else {
+            //pass inputs to db
+            await client.connect();
+            await addSpook(client, {
+                title: `${movieTitle}`,
+                year: `${movieYear}`,
+                director: `${movieDir}`,
+                seen: 'false'
+            });
+            await interaction.reply(`New spook added: ${movieTitle} (${movieYear})!`);
+        }
+        await client.close();
     }
 };
 
