@@ -6,6 +6,8 @@ gen
 config.json
 syllabus.json
 test.js
+.DS_Store
+deploy-commands.js
 
 ### Node template
 # Logs
