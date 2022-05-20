@@ -1,13 +1,13 @@
+.DS_Store
+deploy-test-commands.js
+commands/test.js
+
 # IntelliJ project files
 *.iml
 out
 gen
 .idea
 config.json
-syllabus.json
-test.js
-.DS_Store
-deploy-commands.js
 
 ### Node template
 # Logs
@@ -126,4 +126,3 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
-
