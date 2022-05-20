@@ -40,9 +40,9 @@ module.exports = {
             await client.connect();
             await addSpook(client, {
                 title: `${movieTitle}`,
-                year: `${movieYear}`,
+                year: parseInt(movieYear),
                 director: `${movieDir}`,
-                seen: 'false'
+                seen: false
             });
             await interaction.reply(`New spook added: ${movieTitle} (${movieYear})!`);
         }
