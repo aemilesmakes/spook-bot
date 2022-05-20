@@ -1,6 +1,10 @@
 //This module gets the to-watch list from MongoDB and puts it into an array.
 const { client } = require('./connect.js');
 
+/*
+Gets the to-watch list as an array, sorted by year, oldest to newest
+ */
+
 async function getSyllabus() {
     await client.connect();
 
@@ -19,17 +23,38 @@ async function getSyllabus() {
     await client.close();
 }
 
-async function printSyllabus() {
+/*
+Get an array that's just the movie title + year, for matching purposes.
+ */
+
+async function matchSyllabus() {
     let syllabus = await getSyllabus();
-    let printedSyllabus = "";
+    const arraySyllabus = [];
 
     for (let i = 0; i < syllabus.length; i++) {
-        printedSyllabus += `${syllabus[i].title} (${syllabus[i].year})\n`
+        arraySyllabus.push(`${syllabus[i].title} (${syllabus[i].year})`);
     }
-    return printedSyllabus;
+    await client.close();
+    return arraySyllabus;
+}
+
+
+/*
+Prints the to-watch list as a string, for Discord
+ */
+
+async function stringSyllabus() {
+    let syllabus = await getSyllabus();
+    let stringSyllabus = "";
+
+    for (let i = 0; i < syllabus.length; i++) {
+        stringSyllabus += `${syllabus[i].title} (${syllabus[i].year})\n`
+    }
+    return stringSyllabus;
 }
 
 module.exports = {
     getSyllabus,
-    printSyllabus
+    matchSyllabus,
+    stringSyllabus
 }
