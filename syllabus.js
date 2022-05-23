@@ -1,17 +1,14 @@
-//This module gets the to-watch list from MongoDB and puts it into an array.
 const { client } = require('./connect.js');
 
 /*
-Gets the to-watch list as an array, sorted by year, oldest to newest
+Query the DB for the whole list of spooks/syllabus
  */
-
-async function getSyllabus() {
+async function getAllSpooks() {
     await client.connect();
 
     const cursor = client.db("spooky_film_club").collection("syllabus").find(
         {
-            seen: { $eq: false },
-        }).sort({ year: 1 });
+        });
 
     const results = await cursor.toArray();
 
@@ -24,11 +21,11 @@ async function getSyllabus() {
 }
 
 /*
-Get an array that's just the movie title + year, for matching purposes.
+Get an array from full list of spooks that's JUST the movie title + year, for matching purposes.
  */
 
 async function matchSyllabus() {
-    let syllabus = await getSyllabus();
+    let syllabus = await getAllSpooks();
     const arraySyllabus = [];
 
     for (let i = 0; i < syllabus.length; i++) {
@@ -38,23 +35,42 @@ async function matchSyllabus() {
     return arraySyllabus;
 }
 
+/*
+Gets the to-watch list as an object array, sorted by year
+ */
+async function getToWatch() {
+    let syllabus = await getAllSpooks();
+    const toWatch = [];
+
+    for (let i = 0; i < syllabus.length; i++) {
+        if(syllabus[i].seen === false) {
+            toWatch.push(syllabus[i]);
+        }
+    }
+    return toWatch;
+}
 
 /*
-Prints the to-watch list as a string, for Discord
+Prints the to-watch list as a string, for printing in Discord
  */
 
 async function stringSyllabus() {
-    let syllabus = await getSyllabus();
+    let syllabus = await getAllSpooks();
     let stringSyllabus = "";
 
     for (let i = 0; i < syllabus.length; i++) {
-        stringSyllabus += `${syllabus[i].title} (${syllabus[i].year})\n`
+        if(syllabus[i].seen === false) {
+            stringSyllabus += `${syllabus[i].title} (${syllabus[i].year})\n`
+        }
     }
     return stringSyllabus;
 }
 
 module.exports = {
-    getSyllabus,
+    //getSyllabus,
+    //getFullSyllabus,
+    getAllSpooks,
+    getToWatch,
     matchSyllabus,
     stringSyllabus
 }
