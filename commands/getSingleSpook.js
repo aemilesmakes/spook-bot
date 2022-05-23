@@ -1,6 +1,6 @@
 //This is the command for getting a random spook from the to-watch list.
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { getSyllabus } = require('../syllabus.js');
+const { getToWatch } = require('../syllabus.js');
 
 let suggestArray = [
     "How about",
@@ -29,7 +29,7 @@ module.exports = {
 };
 
 async function getSingleSpook() {
-        let syllabus = await getSyllabus();
-        let random = Math.floor(Math.random() * syllabus.length);
-        return syllabus[random];
+        let toWatch = await getToWatch();
+        let random = Math.floor(Math.random() * toWatch.length);
+        return toWatch[random];
 }
