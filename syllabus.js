@@ -45,22 +45,6 @@ async function getSeenSpooks() {
 }
 
 /*
-Take the allSpooks array -> convert it into an array of JUST the movie title + movie year.
-This is for checking against when a new spook is added using the addSpook command.
- */
-
-async function checkExisting() {
-    let syllabus = await getAllSpooks();
-    const arraySyllabus = [];
-
-    for (let i = 0; i < syllabus.length; i++) {
-        arraySyllabus.push(`${syllabus[i].title} (${syllabus[i].year})`);
-    }
-
-    return arraySyllabus;
-}
-
-/*
 Gets the to-watch list as an object array, for querying with getSingleSpook.
  */
 async function getToWatch() {
@@ -73,6 +57,38 @@ async function getToWatch() {
         }
     }
     return toWatch;
+}
+
+/*
+Take the getToWatch array -> convert it into an array of JUST the movie title + movie year.
+This is for checking against when a new spook is added using the addSpook command.
+ */
+
+async function checkExistingToWatch() {
+    let syllabus = await getToWatch();
+    const arrayToWatch = [];
+
+    for (let i = 0; i < syllabus.length; i++) {
+        arrayToWatch.push(`${syllabus[i].title} (${syllabus[i].year})`);
+    }
+
+    return arrayToWatch;
+}
+
+/*
+Take the getSeenSpooks array -> convert it into an array of JUST the movie title + movie year.
+This is for checking against when a new spook is added using the addSpook command.
+ */
+
+async function checkExistingSeen() {
+    let syllabus = await getSeenSpooks();
+    const arraySeen = [];
+
+    for (let i = 0; i < syllabus.length; i++) {
+        arraySeen.push(`${syllabus[i].title} (${syllabus[i].year})`);
+    }
+
+    return arraySeen;
 }
 
 /*
@@ -109,10 +125,9 @@ async function stringToWatch() {
 }
 
 module.exports = {
-//    getAllSpooks,
-//    getSeenSpooks,
     getToWatch,
-    checkExisting,
+    checkExistingToWatch,
+    checkExistingSeen,
     stringSeen,
     stringToWatch
 }
