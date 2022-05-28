@@ -1,3 +1,5 @@
+//This is where all the functions related to querying and parsing the syllabus live.
+
 const { client } = require('./connect.js');
 const date = require('date-and-time');
 

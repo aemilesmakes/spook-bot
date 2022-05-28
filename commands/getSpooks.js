@@ -17,11 +17,7 @@ module.exports = {
     async execute(interaction) {
         try {
             let numSpooks = interaction.options.getInteger('how-many');
-            console.log(numSpooks);
-
             let randomSpookString = await getRandomSpooksString(numSpooks);
-            //console.log(randomSpookString);
-
             await interaction.reply(`${randomSpookString}`);
         }
         catch {
