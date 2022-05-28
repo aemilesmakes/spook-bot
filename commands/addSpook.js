@@ -1,9 +1,14 @@
-// Add a spook to the database
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { client } = require('../connect.js');
 const { checkExistingToWatch, checkExistingSeen } = require("../syllabus");
 const date = require('date-and-time');
 
+/**
+ * Command that takes input about a movie (title*, year of release*, date watched, director), checks
+ * those inputs to make sure they're valid, and then adds that movie to the database if all checks pass.
+ *
+ * @type {{data: Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">, execute(*): Promise<void>}}
+ */
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('add')
@@ -39,22 +44,14 @@ module.exports = {
         let dateWatched = null;
         let validDate = null;
         let validYear = null;
+        let alreadyExistsToWatch = false;
+        let alreadyExistsSeen = false;
 
-        //check that movieYearString = a valid year in YYYY format
-        let movieYearValid = date.isValid(movieYearString,'YYYY');
-        validYear = movieYearValid === true;
+        validYear = await checkMovieYearValid(movieYearString);
+        alreadyExistsToWatch = await alreadyOnToWatch(movieString);
+        alreadyExistsSeen = await alreadyOnSeen(movieString);
 
-        //check against both the to-watch list
-        let toWatch = await checkExistingToWatch();
-        let alreadyExistsToWatch = !!toWatch.find(spook =>
-            spook === movieString)
-
-        //check against the watched list
-        let haveWatched = await checkExistingSeen();
-        let alreadyExistsSeen = !!haveWatched.find(spook =>
-            spook === movieString)
-
-        //set movieSeenBool to true IF value passed in from SpookBot is "true"
+        //set movieSeenBool to true IF a value has been passed in to the date-watched parameter
         if (dateWatchedString != null) {
             movieSeenBool = true;
             dateWatched = date.parse(dateWatchedString,'M/D/Y');
@@ -129,8 +126,46 @@ module.exports = {
     }
 };
 
+/**
+ * Adds the movie + information from the command input into the database
+ * @param client
+ * @param newSpook
+ * @return {Promise<*>}
+ */
 async function addSpook(client, newSpook){
     const result = await client.db("spooky_film_club").collection("syllabus").insertOne(newSpook);
     console.log(`New spook added with the following id: ${result.insertedId}`);
     return result;
+}
+
+/**
+ * Checks to see if the value entered for movie release year is a valid year
+ * @param movieYearString
+ * @return {Promise<boolean>}
+ */
+async function checkMovieYearValid(movieYearString) {
+    //check that movieYearString = a valid year in YYYY format
+    return date.isValid(movieYearString, 'YYYY');
+}
+
+/**
+ * Checks to see if the title+year combo from command input is already on the "to-watch" list
+ * @param movieString
+ * @return {Promise<boolean>}
+ */
+async function alreadyOnToWatch(movieString) {
+    let toWatch = await checkExistingToWatch();
+    return !!toWatch.find(spook =>
+        spook === movieString);
+}
+
+/**
+ * Checks to see if the title+year combo from command input is already on the "watched" list
+ * @param movieString
+ * @return {Promise<boolean>}
+ */
+async function alreadyOnSeen(movieString) {
+    let haveWatched = await checkExistingSeen();
+    return !!haveWatched.find(spook =>
+        spook === movieString);
 }
