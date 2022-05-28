@@ -31,98 +31,101 @@ module.exports = {
                 .setRequired(false)
         ),
     async execute(interaction) {
+        try {
+            //get inputs from command in discord
+            const movieTitle = interaction.options.getString('title');
+            const movieYearString = interaction.options.getString('year');
+            const movieDir = interaction.options.getString('director');
+            const dateWatchedString = interaction.options.getString('date-watched');
+            const movieString = `${movieTitle} (${movieYearString})`;
 
-        //get inputs from command in discord
-        const movieTitle = interaction.options.getString('title');
-        const movieYearString = interaction.options.getString('year');
-        const movieDir = interaction.options.getString('director');
-        const dateWatchedString = interaction.options.getString('date-watched');
-        const movieString = `${movieTitle} (${movieYearString})`;
+            //set some flags/null values
+            let movieSeenBool = false;
+            let dateWatched = null;
+            let validDate = null;
+            let validYear = null;
+            let alreadyExistsToWatch = false;
+            let alreadyExistsSeen = false;
 
-        //set some flags/null values
-        let movieSeenBool = false;
-        let dateWatched = null;
-        let validDate = null;
-        let validYear = null;
-        let alreadyExistsToWatch = false;
-        let alreadyExistsSeen = false;
+            validYear = await checkMovieYearValid(movieYearString);
+            alreadyExistsToWatch = await alreadyOnToWatch(movieString);
+            alreadyExistsSeen = await alreadyOnSeen(movieString);
 
-        validYear = await checkMovieYearValid(movieYearString);
-        alreadyExistsToWatch = await alreadyOnToWatch(movieString);
-        alreadyExistsSeen = await alreadyOnSeen(movieString);
+            //set movieSeenBool to true IF a value has been passed in to the date-watched parameter
+            if (dateWatchedString != null) {
+                movieSeenBool = true;
+                dateWatched = date.parse(dateWatchedString, 'M/D/Y');
+                validDate = date.isValid(dateWatchedString, 'M/D/Y');
+            }
 
-        //set movieSeenBool to true IF a value has been passed in to the date-watched parameter
-        if (dateWatchedString != null) {
-            movieSeenBool = true;
-            dateWatched = date.parse(dateWatchedString,'M/D/Y');
-            validDate = date.isValid(dateWatchedString,'M/D/Y');
-        }
-
-        //perform checks
-        if (alreadyExistsSeen === true) {
+            //perform checks
+            if (alreadyExistsSeen === true) {
                 await interaction.reply(`We've already watched that.......`); //if it's on the "watched" list
-        } else if (alreadyExistsToWatch === true) {
+            } else if (alreadyExistsToWatch === true) {
                 await interaction.reply(`That spook is already on the to-watch list!`); //if it's on the to-watch list
-        } else if (validYear === false) {
-            await interaction.reply(`Hm, \"${movieYearString}\" is NOT a valid year. Use YYYY format instead!`); //if "year" value is not 4 digits
-        } else if (validDate !== null && validDate !== true) {
-            await interaction.reply(`Hm, ${dateWatched} is NOT a valid date. Use MM/DD/YY format, instead!`);
-        } else {
+            } else if (validYear === false) {
+                await interaction.reply(`Hm, \"${movieYearString}\" is NOT a valid year. Use YYYY format instead!`); //if "year" value is not 4 digits
+            } else if (validDate !== null && validDate !== true) {
+                await interaction.reply(`Hm, ${dateWatched} is NOT a valid date. Use MM/DD/YY format, instead!`);
+            } else {
 
-            //build confirmation string
-            let confirmationString = "Here's what you're adding... \n\n";
-            confirmationString += `**Movie Title**: *${movieTitle}*\n`;
-            confirmationString += `**Year Released**: ${movieYearString}\n`;
-            if(movieDir != null) {
-                confirmationString += `**Directed By**: ${movieDir}\n`;
-            }
-            if(dateWatched != null) {
-                confirmationString += `**Date Watched**: ${dateWatchedString}\n`;
-            }
-            confirmationString += `\nDoes this look correct? (y/n)`;
+                //build confirmation string
+                let confirmationString = "Here's what you're adding... \n\n";
+                confirmationString += `**Movie Title**: *${movieTitle}*\n`;
+                confirmationString += `**Year Released**: ${movieYearString}\n`;
+                if (movieDir != null) {
+                    confirmationString += `**Directed By**: ${movieDir}\n`;
+                }
+                if (dateWatched != null) {
+                    confirmationString += `**Date Watched**: ${dateWatchedString}\n`;
+                }
+                confirmationString += `\nDoes this look correct? (y/n)`;
 
-            //confirm spook info
-            await interaction.reply({
+                //confirm spook info
+                await interaction.reply({
                     content: confirmationString,
                     ephemeral: true
-            }).then(() => {
-                const filter = m => interaction.user.id === m.author.id;
+                }).then(() => {
+                    const filter = m => interaction.user.id === m.author.id;
 
-                //watch for responses for 30 seconds
-                interaction.channel.awaitMessages({ filter, time: 30000, max: 1, errors: ['time'] })
-                    .then(async messages => {
-                        //allow for Y/y N/n
-                        const response = (messages.first().content).toLowerCase();
-                        //if 'y' response
-                        if (response === 'y') {
+                    //watch for responses for 30 seconds
+                    interaction.channel.awaitMessages({filter, time: 30000, max: 1, errors: ['time']})
+                        .then(async messages => {
+                            //allow for Y/y N/n
+                            const response = (messages.first().content).toLowerCase();
+                            //if 'y' response
+                            if (response === 'y') {
 
-                            //add to db
-                            await client.connect();
-                            //pass inputs to db
-                            await addSpook(client, {
-                                title: `${movieTitle}`,
-                                year: parseInt(movieYearString),
-                                director: `${movieDir}`,
-                                seen: movieSeenBool,
-                                date_assigned: dateWatched
-                            });
+                                //add to db
+                                await client.connect();
+                                //pass inputs to db
+                                await addSpook(client, {
+                                    title: `${movieTitle}`,
+                                    year: parseInt(movieYearString),
+                                    director: `${movieDir}`,
+                                    seen: movieSeenBool,
+                                    date_assigned: dateWatched
+                                });
 
-                            interaction.followUp(`"*${movieTitle}* (${movieYearString})" has been added to the syllabus!`);
-                        //if 'n' response
-                        } else if (response === 'n') {
-                            interaction.followUp(`Oh, okay! Never mind, I guess...`);
-                        //if any other response
-                        } else {
-                            interaction.followUp(`Invalid response...`);
-                        }
-                    })
-                    .catch(() => {
-                        //if no response w/in 20 seconds
-                        interaction.followUp('You didn\'t respond in time... Never mind, I guess...');
-                    });
-            });
+                                interaction.followUp(`"*${movieTitle}* (${movieYearString})" has been added to the syllabus!`);
+                                //if 'n' response
+                            } else if (response === 'n') {
+                                interaction.followUp(`Oh, okay! Never mind, I guess...`);
+                                //if any other response
+                            } else {
+                                interaction.followUp(`Invalid response...`);
+                            }
+                        })
+                        .catch(() => {
+                            //if no response w/in 20 seconds
+                            interaction.followUp('You didn\'t respond in time... Never mind, I guess...');
+                        });
+                });
+            }
+            await client.close();
+        } catch {
+            console.error();
         }
-        await client.close();
     }
 };
 
@@ -144,7 +147,6 @@ async function addSpook(client, newSpook){
  * @return {Promise<boolean>}
  */
 async function checkMovieYearValid(movieYearString) {
-    //check that movieYearString = a valid year in YYYY format
     return date.isValid(movieYearString, 'YYYY');
 }
 
