@@ -26,30 +26,30 @@ module.exports = {
                 .setRequired(false)
         ),
     async execute(interaction) {
+
         //get inputs from command in discord
         const movieTitle = interaction.options.getString('title');
         const movieYearString = interaction.options.getString('year');
         const movieDir = interaction.options.getString('director');
-        const dateWatchedString = interaction.options.getString('date');
+        const dateWatchedString = interaction.options.getString('date-watched');
         const movieString = `${movieTitle} (${movieYearString})`;
+
+        //set some flags/null values
         let movieSeenBool = false;
         let dateWatched = null;
         let validDate = null;
         let validYear = null;
 
-        //check that movieYearString = a valid year
-        const earliestValidYear = new Date(1900);
-        const latestValidYear = new Date().getFullYear();
-        let movieYear = date.parse(movieYearString,'YYYY');
+        //check that movieYearString = a valid year in YYYY format
         let movieYearValid = date.isValid(movieYearString,'YYYY');
+        validYear = movieYearValid === true;
 
-        validYear = movieYearValid === true && (movieYear >= earliestValidYear && movieYear <= latestValidYear);
-
-        //check against both the to-watch and already-watched lists
+        //check against both the to-watch list
         let toWatch = await checkExistingToWatch();
         let alreadyExistsToWatch = !!toWatch.find(spook =>
             spook === movieString)
 
+        //check against the watched list
         let haveWatched = await checkExistingSeen();
         let alreadyExistsSeen = !!haveWatched.find(spook =>
             spook === movieString)
@@ -66,24 +66,64 @@ module.exports = {
                 await interaction.reply(`We've already watched that.......`); //if it's on the "watched" list
         } else if (alreadyExistsToWatch === true) {
                 await interaction.reply(`That spook is already on the to-watch list!`); //if it's on the to-watch list
-
         } else if (validYear === false) {
-            await interaction.reply(`\"${movieYearString}\" is NOT a valid year for a movie to have come out in. Try again.`); //if "year" value is not 4 digits
-
+            await interaction.reply(`Hm, \"${movieYearString}\" is NOT a valid year. Use YYYY format instead!`); //if "year" value is not 4 digits
         } else if (validDate !== null && validDate !== true) {
-            await interaction.reply(`Hm, that's not a valid date. Use MM/DD/YY format, instead!`);
+            await interaction.reply(`Hm, ${dateWatched} is NOT a valid date. Use MM/DD/YY format, instead!`);
         } else {
-        //add to db
-            await client.connect();
-            //pass inputs to db
-            await addSpook(client, {
-                title: `${movieTitle}`,
-                year: parseInt(movieYearString),
-                director: `${movieDir}`,
-                seen: movieSeenBool,
-                date_assigned: dateWatched
+
+            //build confirmation string
+            let confirmationString = "Here's what you're adding... \n\n";
+            confirmationString += `**Movie Title**: *${movieTitle}*\n`;
+            confirmationString += `**Year Released**: ${movieYearString}\n`;
+            if(movieDir != null) {
+                confirmationString += `**Directed By**: ${movieDir}\n`;
+            }
+            if(dateWatched != null) {
+                confirmationString += `**Date Watched**: ${dateWatchedString}\n`;
+            }
+            confirmationString += `\nDoes this look correct? (y/n)`;
+
+            //confirm spook info
+            await interaction.reply({
+                    content: confirmationString,
+                    ephemeral: true
+            }).then(() => {
+                const filter = m => interaction.user.id === m.author.id;
+
+                //watch for responses for 30 seconds
+                interaction.channel.awaitMessages({ filter, time: 30000, max: 1, errors: ['time'] })
+                    .then(async messages => {
+                        //allow for Y/y N/n
+                        const response = (messages.first().content).toLowerCase();
+                        //if 'y' response
+                        if (response === 'y') {
+
+                            //add to db
+                            await client.connect();
+                            //pass inputs to db
+                            await addSpook(client, {
+                                title: `${movieTitle}`,
+                                year: parseInt(movieYearString),
+                                director: `${movieDir}`,
+                                seen: movieSeenBool,
+                                date_assigned: dateWatched
+                            });
+
+                            interaction.followUp(`"*${movieTitle}* (${movieYearString})" has been added to the syllabus!`);
+                        //if 'n' response
+                        } else if (response === 'n') {
+                            interaction.followUp(`Oh, okay! Never mind, I guess...`);
+                        //if any other response
+                        } else {
+                            interaction.followUp(`Invalid response...`);
+                        }
+                    })
+                    .catch(() => {
+                        //if no response w/in 20 seconds
+                        interaction.followUp('You didn\'t respond in time... Never mind, I guess...');
+                    });
             });
-            await interaction.reply(`New spook added: ${movieTitle} (${movieYearString}) ${movieSeenBool}!`);
         }
         await client.close();
     }
