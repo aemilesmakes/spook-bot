@@ -1,13 +1,13 @@
-//This command prints the whole syllabus, using the array from syllabus.js
+//This command prints the to-watch list, using the array from syllabus.js
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { stringSyllabus } = require("../syllabus");
+const { stringToWatch } = require("../syllabus");
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('syllabus')
         .setDescription('Prints the entire current to-watch list.'),
     async execute(interaction) {
-        let syllabus = await stringSyllabus();
+        let syllabus = await stringToWatch();
         await interaction.reply(syllabus);
     }
 };
