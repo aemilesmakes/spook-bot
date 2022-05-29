@@ -1,6 +1,11 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const {alreadyOnToWatch} = require("../validation");
-const date = require("date-and-time");
+const {alreadyOnToWatch, getValidDateObject} = require("../validation");
+const {client} = require("../connect");
+const {getSpookID} = require("../syllabus");
+
+/*
+This command marks a movie from the unwatched list as being "seen" and adds the date watched.
+ */
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -27,14 +32,15 @@ module.exports = {
             const movieString = `${movieTitle} (${movieYearString})`;
 
             let alreadyExistsToWatch = await alreadyOnToWatch(movieString);
-            let validDate = date.isValid(dateWatchedString, 'M/D/Y');
+            let movieYearInt = parseInt(movieYearString);
+            let validDateObject = await getValidDateObject(dateWatchedString);
 
             if (!alreadyExistsToWatch) {
                 await interaction.reply({
                     content: `"*${movieTitle}* (${movieYearString})" is not on the to-watch list, so I can't mark it "watched". Embarrassing...`,
                     ephemeral: true
                 });
-            } else if (!validDate){
+            } else if (validDateObject === null){
                 await interaction.reply({
                     content: `ERROR: "${dateWatchedString}" is not a valid date. Do better.`,
                     ephemeral: true
@@ -52,13 +58,23 @@ module.exports = {
                             const response = (messages.first().content).toLowerCase();
                             //if 'y' response
                             if (response === 'y') {
-                                interaction.followUp(`Great!`);
 
-                                //THIS IS WHERE WE UPDATE THE RECORD IN THE DATABASE
+                                await markWatched(client,movieTitle,movieYearInt,
+                                    {
+                                        date_assigned: validDateObject,
+                                        seen: true
+                                    });
 
+                                interaction.followUp({
+                                    content:`Spook updated!`,
+                                    ephemeral: true
+                                });
 
                             } else {
-                                interaction.followUp(`Never mind, then...`);
+                                interaction.followUp({
+                                    content:`Oh, never mind...`,
+                                    ephemeral: true
+                                });
                             }
                         });
                 });
@@ -68,3 +84,23 @@ module.exports = {
         }
     }
 };
+
+/**
+ * Mark a movie on the to-watch list as watched, and add the date it was watched.
+ * @param client
+ * @param title
+ * @param year
+ * @param updatedData
+ * @return {Promise<void>}
+ */
+async function markWatched(client, title, year, updatedData) {
+
+    //get ID to be updated
+    let spookID = await getSpookID(title, year);
+
+    const result = await client.db("spooky_film_club").collection("syllabus")
+        .updateOne({ _id: spookID }, { $set: updatedData });
+
+    //console.log(`${result.matchedCount} document(s) matched the query criteria.`);
+    console.log(`${result.modifiedCount} document(s) was/were updated.`);
+}

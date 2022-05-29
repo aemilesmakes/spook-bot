@@ -1,14 +1,14 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { client } = require('../connect.js');
-const date = require('date-and-time');
-const {alreadyOnToWatch, alreadyOnSeen, checkMovieYearValid} = require("../validation");
+const {alreadyOnToWatch, alreadyOnSeen, checkMovieYearValid, getValidDateObject} = require("../validation");
 
-/**
- * Command that takes input about a movie (title*, year of release*, date watched, director), checks
- * those inputs to make sure they're valid, and then adds that movie to the database if all checks pass.
- *
- * @type {{data: Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">, execute(*): Promise<void>}}
+/*
+This command takes inputs from the user (movie title, movie released year are required, movie director and date watched
+are optional) and performs checks against the movies already on the to-watch/seen list, as well as checking to make sure
+that the given movie released year and date watched inputs are valid. If all checks are passed, it requests confirmation,
+then adds the movie to the database.
  */
+
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('add')
@@ -40,22 +40,21 @@ module.exports = {
             const movieString = `${movieTitle} (${movieYearString})`;
 
             //set some flags/null values
-            let movieSeenBool = false;
             let dateWatched = null;
-            let validDate = null;
+            let validDateObject;
             let validYear = null;
             let alreadyExistsToWatch = false;
             let alreadyExistsSeen = false;
+            let movieSeenBool = false;
 
             validYear = await checkMovieYearValid(movieYearString);
             alreadyExistsToWatch = await alreadyOnToWatch(movieString);
             alreadyExistsSeen = await alreadyOnSeen(movieString);
 
-            //set movieSeenBool to true IF a value has been passed in to the date-watched parameter
-            if (dateWatchedString != null) {
+            //check validity of dateWatchedString
+            if (dateWatchedString !== null) {
+                validDateObject = await getValidDateObject(dateWatchedString);
                 movieSeenBool = true;
-                dateWatched = date.parse(dateWatchedString, 'M/D/Y');
-                validDate = date.isValid(dateWatchedString, 'M/D/Y');
             }
 
             //perform checks
@@ -65,8 +64,8 @@ module.exports = {
                 await interaction.reply(`That spook is already on the to-watch list!`); //if it's on the to-watch list
             } else if (validYear === false) {
                 await interaction.reply(`Hm, \"${movieYearString}\" is NOT a valid year. Use YYYY format instead!`); //if "year" value is not 4 digits
-            } else if (validDate !== null && validDate !== true) {
-                await interaction.reply(`Hm, ${dateWatched} is NOT a valid date. Use MM/DD/YY format, instead!`);
+            } else if (validDateObject === null) {
+                await interaction.reply(`Hm, ${dateWatched} is NOT a valid date. Use MM/DD/YY format, instead!`);//if dateWatched != valid
             } else {
 
                 //build confirmation string
@@ -76,7 +75,7 @@ module.exports = {
                 if (movieDir != null) {
                     confirmationString += `**Directed By**: ${movieDir}\n`;
                 }
-                if (dateWatched != null) {
+                if (validDateObject != null) {
                     confirmationString += `**Date Watched**: ${dateWatchedString}\n`;
                 }
                 confirmationString += `\nDoes this look correct? (y/n)`;
@@ -100,11 +99,11 @@ module.exports = {
                                 await client.connect();
                                 //pass inputs to db
                                 await addSpook(client, {
-                                    title: `${movieTitle}`,
+                                    title: movieTitle,
                                     year: parseInt(movieYearString),
-                                    director: `${movieDir}`,
+                                    director: movieDir,
                                     seen: movieSeenBool,
-                                    date_assigned: dateWatched
+                                    date_assigned: validDateObject
                                 });
 
                                 interaction.followUp(`"*${movieTitle}* (${movieYearString})" has been added to the syllabus!`);

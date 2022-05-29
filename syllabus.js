@@ -136,10 +136,23 @@ async function stringToWatch() {
     return stringSyllabus;
 }
 
+/**
+ * Get the ID of a specific spook, if given the title and year.
+ * @param title
+ * @param year
+ * @return {Promise<*>}
+ */
+async function getSpookID(title, year) {
+    let spooks = await getToWatch();
+    let specificSpook = spooks.find(spook => (spook.title === title && spook.year === year));
+    return specificSpook._id;
+}
+
 module.exports = {
     getToWatch,
     checkExistingToWatch,
     checkExistingSeen,
     stringSeen,
-    stringToWatch
+    stringToWatch,
+    getSpookID
 }
