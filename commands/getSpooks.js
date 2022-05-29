@@ -1,10 +1,10 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { getToWatch } = require('../syllabus.js');
 
-/**
+/*
  * Command that takes int x as input and returns x number of random spooks from the to-watch list.
- * @type {{data: Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">, execute(*): Promise<void>}}
  */
+
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('spook')

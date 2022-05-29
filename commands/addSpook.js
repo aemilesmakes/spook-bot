@@ -2,12 +2,13 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { client } = require('../connect.js');
 const {alreadyOnToWatch, alreadyOnSeen, checkMovieYearValid, getValidDateObject} = require("../validation");
 
-/**
- * Command that takes input about a movie (title*, year of release*, date watched, director), checks
- * those inputs to make sure they're valid, and then adds that movie to the database if all checks pass.
- *
- * @type {{data: Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">, execute(*): Promise<void>}}
+/*
+This command takes inputs from the user (movie title, movie released year are required, movie director and date watched
+are optional) and performs checks against the movies already on the to-watch/seen list, as well as checking to make sure
+that the given movie released year and date watched inputs are valid. If all checks are passed, it requests confirmation,
+then adds the movie to the database.
  */
+
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('add')
