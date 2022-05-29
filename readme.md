@@ -8,6 +8,7 @@ A helper bot for Spooky Film Club.
 * /spook
 * /add
 * /watch
+* /help
 * /boo
 
 --- 
@@ -47,7 +48,12 @@ If "Date Watched" is left empty, the movie is added to the unwatched list.
 
 ---
 
+### /help
+
+**Purpose**: Prints a helpful message that lists all the commands that you can give SpookBot.
+
+---
+
 ### /boo
 
 Aah!
-

@@ -2,13 +2,10 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const {alreadyOnToWatch, getValidDateObject} = require("../validation");
 const {client} = require("../connect");
 const {getSpookID} = require("../syllabus");
-<<<<<<< HEAD
 
 /*
 This command marks a movie from the unwatched list as being "seen" and adds the date watched.
  */
-=======
->>>>>>> a611909973d339f563ec12c2475f5db2c6fbe5b9
 
 module.exports = {
     data: new SlashCommandBuilder()
