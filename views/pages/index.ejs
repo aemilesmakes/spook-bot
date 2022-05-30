@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../partials/head'); %>
+</head>
+<body class="container">
+
+<header>
+    <%- include('../partials/header'); %>
+</header>
+
+<main>
+    <div class="jumbotron">
+
+        <h2>To-Watch List</h2>
+        <p>Here's what we've put on the syllabus:</p>
+
+        <ul>
+            <% spooks.forEach(function(spook) { %>
+                <li>
+                    <strong><%= spook.title %></strong>
+                    (<%= spook.year %>)
+                </li>
+            <% }); %>
+        </ul>
+    </div>
+</main>
+
+<footer>
+    <%- include('../partials/footer'); %>
+</footer>
+
+</body>
+</html>

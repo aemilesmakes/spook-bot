@@ -101,21 +101,25 @@ async function checkExistingSeen() {
 }
 
 /**
- * Converts the object array of watched spooks into a string, so SpookBot can print it in Discord.
- * Uses date-and-time package to make the date nicer.
- *
- * @return object array of all watched spooks
+ * Takes the date_assigned value from the DB and converts it into a formatted date string.
+ * @param dateWatched
+ * @return {Promise<string>}
  */
-async function stringSeen() {
+
+async function formatDateWatched(dateWatched) {
+    let oldDate = new Date(dateWatched);
+    return date.format(oldDate, 'MMM D, YYYY');
+}
+
+async function formattedSeenSpooks() {
     let seenSpooks = await getSeenSpooks();
-    let stringSeen = "";
 
     for (let i = 0; i < seenSpooks.length; i++) {
-        let dateWatched = date.parse((seenSpooks[i].date_assigned).substring(0,10),'YYYY-MM-DD');
-        let dateClean = date.format(dateWatched,'MMM DD, YYYY')
-        stringSeen += `${seenSpooks[i].title} (${seenSpooks[i].year}) - ${dateClean}\n`
+        let dateWatched = seenSpooks[i].date_assigned;
+        seenSpooks[i].date_assigned = await formatDateWatched(dateWatched);
     }
-    return stringSeen;
+
+    return seenSpooks;
 }
 
 /**
@@ -149,10 +153,12 @@ async function getSpookID(title, year) {
 }
 
 module.exports = {
+    getSeenSpooks,
     getToWatch,
     checkExistingToWatch,
     checkExistingSeen,
-    stringSeen,
+    formatDateWatched,
+    formattedSeenSpooks,
     stringToWatch,
     getSpookID
 }

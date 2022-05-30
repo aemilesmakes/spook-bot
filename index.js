@@ -8,6 +8,7 @@ Version: 1.0.0
 const fs = require('node:fs');
 const { Client, Collection, Intents } = require('discord.js');
 const { token } = require('./config.json');
+const {syllabusSite} = require("./server");
 const client = new Client({ intents: [
     Intents.FLAGS.GUILDS,
     Intents.FLAGS.GUILD_MESSAGES
@@ -23,7 +24,8 @@ for (const file of commandFiles) {
 }
 
 //Actions to take when bot is ready
-client.once('ready', () => {
+client.once('ready', async () => {
+    await syllabusSite(); //launch Spooky Syllabus Site
     console.log('SpookBot is ready for class!');
 });
 
