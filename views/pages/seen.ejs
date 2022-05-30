@@ -15,14 +15,14 @@
         <h2>Previously Assigned Spooks</h2>
         <p>Here's what's been assigned so far:</p>
 
-        <ul>
+        <ol>
             <% spooks.forEach(function(spook) { %>
                 <li>
                     <strong><%= spook.title %></strong>
                     (<%= spook.year %>) - <%= spook.date_assigned %>
                 </li>
             <% }); %>
-        </ul>
+        </ol>
     </div>
 </main>
 
