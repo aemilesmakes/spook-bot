@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../partials/head'); %>
+</head>
+<body class="container">
+
+<header>
+    <%- include('../partials/header'); %>
+</header>
+
+<main>
+    <div class="jumbotron">
+
+        <h2>Previously Assigned Spooks</h2>
+        <p>Here's what's been assigned so far:</p>
+
+        <ul>
+            <% spooks.forEach(function(spook) { %>
+                <li>
+                    <strong><%= spook.title %></strong>
+                    (<%= spook.year %>) - <%= spook.date_assigned %>
+                </li>
+            <% }); %>
+        </ul>
+    </div>
+</main>
+
+<footer>
+    <%- include('../partials/footer'); %>
+</footer>
+
+</body>
+</html>
