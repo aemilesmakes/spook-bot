@@ -1,13 +1,11 @@
 let express = require('express');
-const { getToWatch, formattedSeenSpooks} = require("./syllabus");
+const { getToWatch, formattedSeenSpooks } = require("./syllabus");
 let app = express();
+let port = 3000;
 
 async function syllabusSite() {
 
-// set the view engine to ejs
     app.set('view engine', 'ejs');
-
-// use res.render to load up an ejs view file
 
 // index/unwatched page
     app.get('/', async function (req, res) {
@@ -27,8 +25,8 @@ async function syllabusSite() {
         });
     });
 
-    app.listen(3030);
-    console.log('Server is listening on port 3030');
+    app.listen(3000);
+    //console.log(`Server is listening on port ${port}`);
 
 }
 
