@@ -9,6 +9,7 @@ A helper bot for Spooky Film Club.
 * /add
 * /watch
 * /syllabus
+* /help
 * /boo
 
 --- 
@@ -50,8 +51,13 @@ If "Date Watched" is left empty, the movie is added to the unwatched list.
 
 ### /syllabus
 
-**Purpose**: Prints a link to [spookyfilm.club](https://www.spookyfilm.club), where the to-watch and 
-have-watched lists can be found. 
+**Purpose**: Prints a link to [spookyfilm.club](https://www.spookyfilm.club), where the to-watch and have-watched lists can be found. 
+
+---
+
+### /help
+
+**Purpose**: Prints a helpful message that lists all the commands that you can give SpookBot.
 
 ---
 
