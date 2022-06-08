@@ -1,4 +1,4 @@
-# SpookBot (v.1.5.0)
+# SpookBot (v.1.6.0)
 A helper bot for Spooky Film Club.
 
 ***
@@ -8,6 +8,7 @@ A helper bot for Spooky Film Club.
 * /spook
 * /add
 * /watch
+* /syllabus
 * /help
 * /boo
 
@@ -48,6 +49,12 @@ If "Date Watched" is left empty, the movie is added to the unwatched list.
 
 ---
 
+### /syllabus
+
+**Purpose**: Prints a link to [spookyfilm.club](https://www.spookyfilm.club), where the to-watch and have-watched lists can be found. 
+
+---
+
 ### /help
 
 **Purpose**: Prints a helpful message that lists all the commands that you can give SpookBot.
@@ -57,3 +64,10 @@ If "Date Watched" is left empty, the movie is added to the unwatched list.
 ### /boo
 
 Aah!
+
+---
+
+## Changelog
+
+* **1.6.0** - spookyfilm.club is now up and running!
+* **1.5.0** (and earlier) - dark sorcery!

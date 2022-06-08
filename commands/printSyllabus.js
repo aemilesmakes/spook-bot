@@ -7,6 +7,7 @@ module.exports = {
         .setName('syllabus')
         .setDescription('Prints the entire current to-watch list.'),
     async execute(interaction) {
-        await interaction.reply("Visit spookyfilm.club to see the syllabus!");
+
+      await interaction.reply("Visit [spookyfilm.club](http://www.spookyfilm.club) to see the syllabus!");
     }
 };
